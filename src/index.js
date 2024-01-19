@@ -8,6 +8,7 @@ require("dotenv").config();
 // Importing models
 const User = require("./models/User.model");
 const Message = require("./models/Message.model");
+const Admin = require("./models/Admin.model");
 
 const app = express();
 app.use(cors());
@@ -45,13 +46,28 @@ io.on("connection", (socket) => {
 
   socket.on("send_message", async ({ email, message }) => {
     const user = await User.findOne({ email });
-    const newMessage = await new Message({ sender: user._id, content: message });
+    const newMessage = await new Message({
+      sender: user._id,
+      content: message,
+    });
 
     newMessage.save();
 
     const allMessages = await Message.find({ sender: user.id });
     // socket.broadcast.emit("received_message", message);
     socket.to(user.email).emit("received_message", allMessages);
+  });
+
+  // For Admin
+  socket.on("login", async (email) => {
+    const admin = await Admin.findOne({ email });
+    if (!admin) {
+      socket.emit("admin_login_error", "Email not found");
+    }
+    
+    const users = await User.find({});
+    console.log({users})
+    socket.emit("admin_login_success", users);
   });
 });
 
