@@ -50,7 +50,6 @@ io.on("connection", (socket) => {
       const user = await User.findOne({ email });
 
       if (!user) {
-        // Handle the case where the user is not found
         console.error(`User not found for email: ${email}`);
         return;
       }
@@ -67,7 +66,6 @@ io.on("connection", (socket) => {
       const allMessages = await Message.find({ user: user._id });
       socket.to(email).emit("received_message_client", allMessages);
     } catch (error) {
-      // Handle any errors that occur during database operations
       console.error("Error in send_message handler:", error);
     }
   });
