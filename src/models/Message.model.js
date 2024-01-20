@@ -6,14 +6,18 @@ const messageSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    sender: {
+    user: {
       type: mongoose.Schema.Types.ObjectID,
       ref: User,
     },
-    // recipient: {
-    //   type: mongoose.Schema.Types.ObjectID,
-    //   ref: Admin,
-    // },
+    sender: {
+      type: String,
+      required: true,
+    },
+    recipient: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );

@@ -30,9 +30,11 @@ io.on("connection", (socket) => {
   socket.on("join_room", async (room) => {
     const user = await User.findOne({ email: room });
     if (user) {
-      const allMessages = await Message.find({ sender: user.id });
-      socket.emit("user_found", allMessages);
-      socket.join(user.email);
+      const allMessages = await Message.find({ user: user._id });
+      socket.join(room);
+      if (allMessages) {
+        socket.emit("user_found", allMessages);
+      }
     } else {
       const newUser = await new User({
         email: room,
@@ -40,23 +42,36 @@ io.on("connection", (socket) => {
       newUser.save();
       socket.emit("user_created", newUser.email);
 
-      socket.join(room);
+      socket.join(newUser.room);
+    }
+  });
+  socket.on("send_message", async ({ email, message }) => {
+    try {
+      const user = await User.findOne({ email });
+
+      if (!user) {
+        // Handle the case where the user is not found
+        console.error(`User not found for email: ${email}`);
+        return;
+      }
+
+      const newMessage = await new Message({
+        user: user._id,
+        content: message,
+        sender: email,
+        recipient: "admin@gmail.com",
+      });
+
+      await newMessage.save();
+
+      const allMessages = await Message.find({ user: user._id });
+      socket.to(email).emit("received_message_client", allMessages);
+    } catch (error) {
+      // Handle any errors that occur during database operations
+      console.error("Error in send_message handler:", error);
     }
   });
 
-  socket.on("send_message", async ({ email, message }) => {
-    const user = await User.findOne({ email });
-    const newMessage = await new Message({
-      sender: user._id,
-      content: message,
-    });
-
-    newMessage.save();
-
-    const allMessages = await Message.find({ sender: user.id });
-    // socket.broadcast.emit("received_message", message);
-    socket.to(user.email).emit("received_message", allMessages);
-  });
 
   // For Admin
   socket.on("login", async (email) => {
@@ -64,10 +79,33 @@ io.on("connection", (socket) => {
     if (!admin) {
       socket.emit("admin_login_error", "Email not found");
     }
-    
+
     const users = await User.find({});
-    console.log({users})
     socket.emit("admin_login_success", users);
+  });
+  socket.on("admin_join_room", async ({ admin, clientEmail }) => {
+    const user = await User.findOne({ email: clientEmail });
+    if (user) {
+      const allMessages = await Message.find({ user: user._id });
+      if (allMessages) {
+        socket.emit("admin_user_found", allMessages);
+      }
+      socket.join(admin);
+    }
+  });
+
+  socket.on("admin_send_message", async ({ message, email }) => {
+    const user = await User.findOne({ email });
+    const newMessage = await new Message({
+      user: user._id,
+      content: message,
+      recipient: email,
+      sender: "admin@gmail.com",
+    });
+
+    newMessage.save();
+    const allMessages = await Message.find({ user: user._id });
+    socket.to(user.email).emit("received_message", allMessages);
   });
 });
 
