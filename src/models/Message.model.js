@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Reply = require("./Reply.model");
 const User = require("./User.model");
 const messageSchema = new mongoose.Schema(
   {
@@ -18,6 +19,12 @@ const messageSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    replies: [
+      {
+        type: String,
+        required: false,
+      },
+    ],
   },
   { timestamps: true }
 );

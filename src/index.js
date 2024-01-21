@@ -9,6 +9,7 @@ require("dotenv").config();
 const User = require("./models/User.model");
 const Message = require("./models/Message.model");
 const Admin = require("./models/Admin.model");
+const Reply = require("./models/Reply.model");
 
 const app = express();
 app.use(cors());
@@ -70,7 +71,6 @@ io.on("connection", (socket) => {
     }
   });
 
-
   // For Admin
   socket.on("login", async (email) => {
     const admin = await Admin.findOne({ email });
@@ -105,6 +105,32 @@ io.on("connection", (socket) => {
     const allMessages = await Message.find({ user: user._id });
     socket.to(user.email).emit("received_message", allMessages);
   });
+
+  socket.on(
+    "admin_reply_specific_message",
+    async ({ userEmail, messageId, repliedMessage }) => {
+      const user = await User.findOne({ email: userEmail });
+
+      const message = await Message.findByIdAndUpdate(
+        messageId,
+        {
+          $push: {
+            replies: repliedMessage,
+          },
+        },
+        {
+          new: true,
+        }
+      );
+
+      message.save();
+      const allMessages = await Message.find({ user: user._id }).populate(
+        "replies"
+      );
+
+      socket.to(user.email).emit("received_message", allMessages);
+    }
+  );
 });
 
 const PORT = 3001;
