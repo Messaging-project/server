@@ -1,6 +1,6 @@
 # Chat Application with Socket.io and MongoDB
 
-This is a simple chat application built with Node.js, Express, MongoDB, and Socket.io. The application allows users to join chat rooms, send and receive messages in real-time, and supports admin functionalities.
+This is a simple chat application built with Node.js, Express, MongoDB, and Socket.io. The application allows a user to join chat rooms, send and receive messages in real-time from the admin.
 
 ## Prerequisites
 
@@ -39,6 +39,8 @@ Make sure you have the following installed on your local machine:
    npm start
    ```
    The server will start on port 3001, and you can access the application at http://localhost:3001.
+
+5. To Login as admin, use `admin@gmail.com` as the email
 
 ## Usage
 
