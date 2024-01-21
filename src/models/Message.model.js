@@ -18,6 +18,12 @@ const messageSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    replies: [
+      {
+        type: String,
+        required: false,
+      },
+    ],
   },
   { timestamps: true }
 );

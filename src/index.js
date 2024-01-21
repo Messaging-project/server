@@ -50,7 +50,6 @@ io.on("connection", (socket) => {
       const user = await User.findOne({ email });
 
       if (!user) {
-        // Handle the case where the user is not found
         console.error(`User not found for email: ${email}`);
         return;
       }
@@ -67,11 +66,9 @@ io.on("connection", (socket) => {
       const allMessages = await Message.find({ user: user._id });
       socket.to(email).emit("received_message_client", allMessages);
     } catch (error) {
-      // Handle any errors that occur during database operations
       console.error("Error in send_message handler:", error);
     }
   });
-
 
   // For Admin
   socket.on("login", async (email) => {
@@ -107,6 +104,32 @@ io.on("connection", (socket) => {
     const allMessages = await Message.find({ user: user._id });
     socket.to(user.email).emit("received_message", allMessages);
   });
+
+  socket.on(
+    "admin_reply_specific_message",
+    async ({ userEmail, messageId, repliedMessage }) => {
+      const user = await User.findOne({ email: userEmail });
+
+      const message = await Message.findByIdAndUpdate(
+        messageId,
+        {
+          $push: {
+            replies: repliedMessage,
+          },
+        },
+        {
+          new: true,
+        }
+      );
+
+      message.save();
+      const allMessages = await Message.find({ user: user._id }).populate(
+        "replies"
+      );
+
+      socket.to(user.email).emit("received_message", allMessages);
+    }
+  );
 });
 
 const PORT = 3001;
