@@ -1,6 +1,6 @@
 # Chat Application with Socket.io and MongoDB
 
-This is a simple chat application built with Node.js, Express, MongoDB, and Socket.io. The application allows users to join chat rooms, send and receive messages in real-time, and supports admin functionalities.
+This is a simple chat application built with Node.js, Express, MongoDB, and Socket.io. The application allows a user to join chat rooms, send and receive messages in real-time from the admin.
 
 ## Prerequisites
 
