@@ -40,6 +40,8 @@ Make sure you have the following installed on your local machine:
    ```
    The server will start on port 3001, and you can access the application at http://localhost:3001.
 
+5. To Login as admin, use `admin@gmail.com` as the email
+
 ## Usage
 
 ### User Interaction
