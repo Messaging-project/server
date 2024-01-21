@@ -9,7 +9,6 @@ require("dotenv").config();
 const User = require("./models/User.model");
 const Message = require("./models/Message.model");
 const Admin = require("./models/Admin.model");
-const Reply = require("./models/Reply.model");
 
 const app = express();
 app.use(cors());

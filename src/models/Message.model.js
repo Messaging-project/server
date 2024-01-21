@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const Reply = require("./Reply.model");
 const User = require("./User.model");
 const messageSchema = new mongoose.Schema(
   {
